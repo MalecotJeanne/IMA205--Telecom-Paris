@@ -1,0 +1,112 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\geometry{hmargin=2.5cm,vmargin=1.5cm}
+
+\title{TP : Introduction Supervised Learning}
+\author{Jeanne Malécot}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{OLS}
+Since $\tilde{\beta}$ is unbiased : 
+
+\begin{align} 
+    \beta & =\mathbb{E}(\tilde{\beta})              \\
+          & = \mathbb{E}(Hy) + \mathbb{E}(Dy)       \\  
+          & = \mathbb{E}(\beta ^*) + D\mathbb{E}(y) \\
+          & = \beta  + D\mathbb{E}(y)
+\end{align}
+Then we have $DX\beta = 0$, and finally :
+
+$$ 
+    \boxed{DX = 0}
+$$
+
+Now we compute :
+\begin{align} 
+    Var(\tilde{\beta}) & = Var(Cy)                                                  \\
+                       & = \sigma^2(H+D)(H^T+D^T)                                   \\  
+                       & = \sigma^2HH^T + \sigma^2DD^T + \sigma^2DH^T +\sigma^2HD^T \\
+                       & = \sigma^2HH^T + \sigma^2DD^T 
+\end{align}
+And $ Var(\beta^*) = \sigma^2 HH^T $.   
+So we have
+$$
+    Var(\tilde{\beta}) = Var(\beta^*) + \sigma^2DD^T    
+$$
+And finally : 
+
+$$
+    \boxed{Var(\tilde{\beta}) > Var(\beta^*) }
+$$
+
+\section{Ridge Regression}
+
+We have $\beta^*_{ridge} = (\lambda I_d + X^TX)^{-1}X^TY$. 
+
+\begin{align} 
+    \mathbb{E}[\beta^*_{ridge}] & = \mathbb{E}[(\lambda I_d + X^TX)^{-1}X^Ty]                                                        \\
+                                & = (\lambda I_d + X^TX)^{-1}X^TX\theta                                                              \\ 
+                                & = (\lambda I_d + X^TX)^{-1}(\lambda I_d + X^TX)\theta - \lambda I_d(\lambda I_d + X^TX)^{-1}\theta \\
+                                & = \theta - \underbrace{\lambda I_d(\lambda I_d + X^TX)^{-1}\theta}_{bias}
+\end{align}
+
+$X = UDV^T$, so :
+
+\begin{align} 
+    \beta^*_{ridge} & = (\lambda I_d + X^TX)^{-1}X^T      \\
+                    & = (\lambda I_d + VD^2V^T)^{-1}VDU^T \\
+                    & = (V(\lambda +D^2)V^T)^{-1}VDU^T    \\    
+                    & = V(D^2 + \lambda)^{-1}DU^T
+\end{align}
+
+$$ \boxed{ \beta^*_{ridge}= V(D^2 + \lambda)^{-1}DU^T} $$
+
+\begin{align}
+    Var(\beta^*_{ridge}) & = \mathbb{E}[(V(D^2 + \lambda I_d)^{-1}DU^T\epsilon)(V(D^2 + \lambda I_d)^{-1}DU^T\epsilon)^T] \\
+                         & = \sigma^2V(D^2 + \lambda I_d)^{-1}D^2(D^2 + \lambda I_d)^{-1}V^T 
+\end{align}
+
+With $D = diag(d_i)$ : 
+$$
+    Var(\beta^*_{ridge}) = \sigma^2V diag(\frac{d_i^2}{(d_i^2 + \lambda)^2})V^T
+$$
+
+So : $ Var(\beta^*_{ridge}) -  Var(\beta^*_{OLS}) = \sigma^2Vdiag(\frac{1}{d_i^2}(\frac{1}{(1+ \frac{\lambda}{d_i^2})^2} - 1))V^T$.
+
+If $ \lambda \geq 0 $ :  
+
+$$
+    \frac{1}{d_i^2}( \frac{1}{(1+ \frac{\lambda}{d_i^2})^2} - 1) \leq 0
+$$
+
+And then :
+$$
+    \boxed{Var(\beta^*_{ridge}) \leq  Var(\beta^*_{OLS})}
+$$
+
+
+We have :
+$$
+    \lim_{\lambda \to +\infty} Var(\beta^*_{ridge}) = 0 $$
+$$
+    \lim_{\lambda \to 0} Var(\beta^*_{ridge})  = \sigma^2(X^TX)^{-1}
+$$
+
+Since $ \mathbb{E}[\beta^*_{ridge}] =  V diag(\frac{d_i^2}{(d_i^2 + \lambda)})V^T\theta $ :
+
+$$
+    \boxed{\lim_{\lambda \to +\infty} \mathbb{E}[\beta^*_{ridge}] = 0} 
+$$
+$$
+\boxed{\lim_{\lambda \to 0} \mathbb{E}[\beta^*_{ridge}] =  \theta}
+$$
+
+\end{document}
